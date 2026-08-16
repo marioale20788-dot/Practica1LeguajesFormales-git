@@ -18,17 +18,17 @@ public class AnalizadorPz {
     private int fila;
     private int columna;
     private Archivo archivo = new Archivo();
-    private procesador procesadorPz;
+    private Procesador procesadorPz;
 
     public AnalizadorPz(File archivo) throws IOException {
         this.contenido = this.archivo.leerArchivo(archivo);
         this.posicion = 0;
         this.fila = 1;
         this.columna = 1;
-        this.procesadorPz = new procesador();
+        this.procesadorPz = new Procesador();
     }
 
-    public procesador getProcesadorPz() {
+    public Procesador getProcesadorPz() {
         return procesadorPz;
     }
 
@@ -187,12 +187,12 @@ public class AnalizadorPz {
             }
             posicion++;
         }
-        procesadorPz.agregarError("/*", "Comentario bloque sin cerrar", fila, columna);
+        procesadorPz.agregarError("/*", "Comentario de bloque sin cerrar", fila, columna);
     }
 
     public void procesarCadena() {
-        int iniFila = fila;
-        int iniCol = columna;
+        int inicioFila = fila;
+        int inicioColumna = columna;
         String lexema = "\"";
 
         posicion++;
@@ -204,7 +204,7 @@ public class AnalizadorPz {
                 lexema = lexema + '"';
                 posicion++;
                 columna++;
-                procesadorPz.agregarToken(lexema, "CADENA", iniFila, iniCol);
+                procesadorPz.agregarToken(lexema, "CADENA", inicioFila, inicioColumna);
                 return;
             }
             if (c == '\n') {
@@ -215,12 +215,12 @@ public class AnalizadorPz {
             columna++;
         }
 
-        procesadorPz.agregarError(lexema, "Cadena sin cerrar", iniFila, iniCol);
+        procesadorPz.agregarError(lexema, "Cadena sin cerrar", inicioFila, inicioColumna);
     }
 
     public void procesarNumero() {
-        int iniFila = fila;
-        int iniCol = columna;
+        int inicioFila = fila;
+        int inicioColumna = columna;
         String lexema = "";
         boolean esDecimal = false;
 
@@ -246,12 +246,12 @@ public class AnalizadorPz {
         } else {
             tipo = "LITERAL_ENTERO";
         }
-        procesadorPz.agregarToken(lexema, tipo, iniFila, iniCol);
+        procesadorPz.agregarToken(lexema, tipo, inicioFila, inicioColumna);
     }
 
     public void procesarIdentificador() {
         int inicioFila = fila;
-        int inicioCol = columna;
+        int inicioColumna = columna;
         String lexema = "";
 
         while (posicion < contenido.length()) {
@@ -267,7 +267,7 @@ public class AnalizadorPz {
       
 
         String tipo = clasificarIdentificador(lexema);
-        procesadorPz.agregarToken(lexema, tipo, inicioFila, inicioCol);
+        procesadorPz.agregarToken(lexema, tipo, inicioFila, inicioColumna);
     }
 
     public String clasificarIdentificador(String lexema) {
@@ -290,8 +290,8 @@ public class AnalizadorPz {
     }
 
     public void procesarDirectiva() {
-        int iniFila = fila;
-        int iniCol = columna;
+        int inicioFila = fila;
+        int inicioColumna = columna;
         String lexema = "@";
 
         posicion++;
@@ -309,9 +309,9 @@ public class AnalizadorPz {
         }
 
         if (directivaValida(lexema)) {
-            procesadorPz.agregarToken(lexema, "DIRECTIVA", iniFila, iniCol);
+            procesadorPz.agregarToken(lexema, "DIRECTIVA", inicioFila, inicioColumna);
         } else {
-            procesadorPz.agregarError(lexema, "Directiva no válida", iniFila, iniCol);
+            procesadorPz.agregarError(lexema, "Directiva no es válida", inicioFila, inicioColumna);
         }
     }
 
@@ -320,9 +320,9 @@ public class AnalizadorPz {
     }
 
     public void procesarFlecha() {
-        int iniFila = fila;
-        int iniCol = columna;
-        procesadorPz.agregarToken("->", "CONECTOR", iniFila, iniCol);
+        int inicioFila = fila;
+        int inicioColumna = columna;
+        procesadorPz.agregarToken("->", "CONECTOR", inicioFila, inicioColumna);
         posicion = posicion + 2;
         columna = columna + 2;
     }

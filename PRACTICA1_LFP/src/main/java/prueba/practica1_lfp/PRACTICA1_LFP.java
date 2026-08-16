@@ -15,6 +15,8 @@ public class PRACTICA1_LFP {
   
 
     public static void main(String[] args) {
+        MotorAnalizador controlador = new MotorAnalizador();
+       controlador.inciarAnalizadorLexico();
         
     }
     }

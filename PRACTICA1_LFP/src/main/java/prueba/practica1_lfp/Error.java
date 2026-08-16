@@ -11,24 +11,26 @@ package prueba.practica1_lfp;
 public class Error {
     
     private String lexema;
-    private String mensaje;
+    private String tipoError;
     private int fila;
     private int columna;
+    private int numero;
     
     
-        public Error(String lexema, String mensaje, int fila, int columna) {
+        public Error(String lexema, String error, int fila, int columna, int numero) {
         this.lexema = lexema;
-        this.mensaje = mensaje;
+        this.tipoError = error;
         this.fila = fila;
         this.columna = columna;
+        this.numero=numero;
     }
 
     public String getLexema() {
         return lexema;
     }
 
-    public String getMensaje() {
-        return mensaje;
+    public String getTipoError() {
+        return tipoError;
     }
 
     public int getFila() {
@@ -37,6 +39,10 @@ public class Error {
 
     public int getColumna() {
         return columna;
+    }
+
+    public int getNumero() {
+        return numero;
     }
     
 }
