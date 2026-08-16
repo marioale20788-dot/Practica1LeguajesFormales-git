@@ -4,6 +4,7 @@
  */
 package prueba.practica1_lfp;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.table.DefaultTableModel;
@@ -39,8 +40,10 @@ public class MotorAnalizador {
 
     public void cargaTablaTokensCorrectos() {
         DefaultTableModel modeloTabla = (DefaultTableModel) principalFrame.getTableTokensCorrectos().getModel();
+ 
         Token[] tokensCorrectos = analizador.getProcesadorPz().getTokens();
         modeloTabla.setRowCount(0);
+     
         for (int i = 0; i < tokensCorrectos.length; i++) {
             Token tokensCorrecto = tokensCorrectos[i];
             if (tokensCorrecto != null) {
@@ -75,6 +78,15 @@ public class MotorAnalizador {
 
         }
 
+    }
+    
+    public void crearHtmlTokensCorrectos(){
+        String ruta = principalFrame.getDireccionHtml();
+        analizador.creraHtmlTokensCorrectos(ruta);
+    }
+    public void crearHtmlTokensIncorrectos(){
+         String ruta = principalFrame.getDireccionHtml();
+        analizador.crearHtmlTokensIncorrectos(ruta);
     }
 
 }

@@ -17,18 +17,20 @@ import javax.swing.JTable;
  */
 public class FramePrincipal extends javax.swing.JFrame {
 
-    private File archivo;
+    private File archivoFile;
     private MotorAnalizador motor;
+    private String direccionHtml;
 
     /**
      * Creates new form FramePrincipal
      */
     public FramePrincipal() {
         initComponents();
+        this.setResizable(false);
     }
 
     public File getArchivo() {
-        return archivo;
+        return archivoFile;
     }
 
     public JTable getTableTokensCorrectos() {
@@ -41,6 +43,10 @@ public class FramePrincipal extends javax.swing.JFrame {
 
     public void setMotor(MotorAnalizador motor) {
         this.motor = motor;
+    }
+
+    public String getDireccionHtml() {
+        return direccionHtml;
     }
 
     /**
@@ -63,6 +69,8 @@ public class FramePrincipal extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jScrollPane1.setBackground(new java.awt.Color(255, 255, 204));
+
         TableTokensCorrectos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
@@ -75,6 +83,9 @@ public class FramePrincipal extends javax.swing.JFrame {
             }
         ));
         jScrollPane1.setViewportView(TableTokensCorrectos);
+
+        jScrollPane3.setBackground(new java.awt.Color(255, 255, 153));
+        jScrollPane3.setForeground(new java.awt.Color(255, 255, 204));
 
         TableTokensIncorrectos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -89,6 +100,9 @@ public class FramePrincipal extends javax.swing.JFrame {
         ));
         jScrollPane3.setViewportView(TableTokensIncorrectos);
 
+        jMenuBar1.setBackground(new java.awt.Color(255, 255, 255));
+
+        btnCargarArchvio.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         btnCargarArchvio.setText("Cargar archivo");
         btnCargarArchvio.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -97,10 +111,22 @@ public class FramePrincipal extends javax.swing.JFrame {
         });
         jMenuBar1.add(btnCargarArchvio);
 
+        btnTokensCorrectosHTml.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         btnTokensCorrectosHTml.setText("Importar html tokens correctos");
+        btnTokensCorrectosHTml.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnTokensCorrectosHTmlMouseClicked(evt);
+            }
+        });
         jMenuBar1.add(btnTokensCorrectosHTml);
 
+        btnTokensIncorrectosHtml.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         btnTokensIncorrectosHtml.setText("Importar html tokens incorrectos");
+        btnTokensIncorrectosHtml.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnTokensIncorrectosHtmlMouseClicked(evt);
+            }
+        });
         jMenuBar1.add(btnTokensIncorrectosHtml);
 
         setJMenuBar(jMenuBar1);
@@ -111,9 +137,9 @@ public class FramePrincipal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 840, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 852, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 852, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3))
                 .addContainerGap(18, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -123,7 +149,7 @@ public class FramePrincipal extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 424, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(58, Short.MAX_VALUE))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
 
         pack();
@@ -135,20 +161,58 @@ public class FramePrincipal extends javax.swing.JFrame {
 
         if (resultado == JFileChooser.APPROVE_OPTION) {
 
-            archivo = seleccionar.getSelectedFile();
-            String nombreArchivo = archivo.getName();
+            archivoFile = seleccionar.getSelectedFile();
+            String nombreArchivo = archivoFile.getName();
             if (nombreArchivo.endsWith(".pz")) {
                 motor.cargarArchivo();
-            }else{
-                JOptionPane.showConfirmDialog(null, "FORMATO DE ARCHIVO INCORRECTO");
+            } else {
+                JOptionPane.showMessageDialog(null, "FORMATO DE ARCHIVO INCORRECTO");
             }
-            
+
         } else {
             JOptionPane.showMessageDialog(null, "No se pudo cargar el archivo");
         }
 
         // TODO add your handling code here:
     }//GEN-LAST:event_btnCargarArchvioMouseClicked
+
+    private void btnTokensCorrectosHTmlMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTokensCorrectosHTmlMouseClicked
+        JFileChooser seleccionar = new JFileChooser();
+        seleccionar.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        int resultado = seleccionar.showOpenDialog(null);
+
+        if (resultado == JFileChooser.APPROVE_OPTION && archivoFile!=null) {
+
+            File carpeta = seleccionar.getSelectedFile();
+            direccionHtml = carpeta.getAbsolutePath();
+            motor.crearHtmlTokensCorrectos();
+
+        }else{
+            JOptionPane.showMessageDialog(null, "No se puede crear el archivo html");
+        }
+// TODO add your handling code here:
+    }//GEN-LAST:event_btnTokensCorrectosHTmlMouseClicked
+
+    private void btnTokensIncorrectosHtmlMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTokensIncorrectosHtmlMouseClicked
+        JFileChooser seleccionar = new JFileChooser();
+        seleccionar.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        int resultado = seleccionar.showOpenDialog(null);
+
+        if (resultado == JFileChooser.APPROVE_OPTION && archivoFile!=null) {
+
+            File carpeta = seleccionar.getSelectedFile();
+            direccionHtml = carpeta.getAbsolutePath();
+            motor.crearHtmlTokensIncorrectos();
+
+        }else{
+            JOptionPane.showMessageDialog(null, "No se puede crear el archivo html");
+        }
+// TODO add 
+
+// TODO add your handling code here:
+    }//GEN-LAST:event_btnTokensIncorrectosHtmlMouseClicked
 
     /**
      * @param args the command line arguments

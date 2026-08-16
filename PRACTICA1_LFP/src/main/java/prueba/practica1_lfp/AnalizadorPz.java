@@ -33,21 +33,21 @@ public class AnalizadorPz {
     }
 
     public void analizar() {
-     
+
         while (posicion < contenido.length()) {
             char c = contenido.charAt(posicion);
 
-            if (espacio(c)) {
+            if (espacio(c) == true) {
                 avanzarEspacio(c);
                 continue;
             }
 
-            if (comentarioLinea(c)) {
+            if (comentarioLinea(c) == true) {
                 saltarComentarioLinea();
                 continue;
             }
 
-            if (comentarioBloque(c)) {
+            if (comentarioBloque(c) == true) {
                 saltarComentarioBloque();
                 continue;
             }
@@ -57,12 +57,12 @@ public class AnalizadorPz {
                 continue;
             }
 
-            if (digito(c)) {
+            if (digito(c) == true) {
                 procesarNumero();
                 continue;
             }
 
-            if (letra(c) || c == '_') {
+            if (letra(c) == true || c == '_') {
                 procesarIdentificador();
                 continue;
             }
@@ -72,17 +72,17 @@ public class AnalizadorPz {
                 continue;
             }
 
-            if (flecha(c)) {
+            if (flecha(c) == true) {
                 procesarFlecha();
                 continue;
             }
 
-            if (delimitador(c)) {
+            if (delimitador(c) == true) {
                 procesarDelimitador(c);
                 continue;
             }
 
-            if (operador(c)) {
+            if (operador(c) == true) {
                 procesarOperador(c);
                 continue;
             }
@@ -95,7 +95,7 @@ public class AnalizadorPz {
     }
 
     public boolean espacio(char c) {
-        if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
+        if (c == ' ' || c == '\t' || c == '\n') {
             return true;
         }
         return false;
@@ -193,18 +193,19 @@ public class AnalizadorPz {
     public void procesarCadena() {
         int inicioFila = fila;
         int inicioColumna = columna;
-        String lexema = "\"";
-
+        String lexema = "";
+        procesadorPz.agregarToken("\"", "DELIMITADOR", inicioFila, inicioColumna);
         posicion++;
         columna++;
 
         while (posicion < contenido.length()) {
             char c = contenido.charAt(posicion);
             if (c == '"') {
-                lexema = lexema + '"';
+                procesadorPz.agregarToken(lexema, "LITERAL_CADENA", inicioFila, inicioColumna + 1);
+                procesadorPz.agregarToken("\"", "DELIMITADOR", inicioFila, columna);
                 posicion++;
                 columna++;
-                procesadorPz.agregarToken(lexema, "CADENA", inicioFila, inicioColumna);
+
                 return;
             }
             if (c == '\n') {
@@ -264,7 +265,6 @@ public class AnalizadorPz {
                 break;
             }
         }
-      
 
         String tipo = clasificarIdentificador(lexema);
         procesadorPz.agregarToken(lexema, tipo, inicioFila, inicioColumna);
@@ -279,12 +279,15 @@ public class AnalizadorPz {
         if (lexema.equals("PREGUNTAR") || lexema.equals("GENERAR")
                 || lexema.equals("RESUMIR") || lexema.equals("ANALIZAR")
                 || lexema.equals("TRADUCIR") || lexema.equals("CLASIFICAR")
-                || lexema.equals("EXTRAER") || lexema.equals("CARGAR")) {
+                || lexema.equals("EXTRAER")) {
             return "COMANDO_IA";
         }
         if (lexema.equals("SOBRE") || lexema.equals("DESDE")
                 || lexema.equals("EN") || lexema.equals("COMO")) {
             return "CONECTOR";
+        }
+        if (lexema.equals("CARGAR")) {
+            return "FUNCION";
         }
         return "IDENTIFICADOR";
     }
@@ -343,6 +346,37 @@ public class AnalizadorPz {
         procesadorPz.agregarToken("" + c, tipo, fila, columna);
         posicion++;
         columna++;
+    }
+
+    public void creraHtmlTokensCorrectos(String ruta) {
+        archivo.crearArchivoHtml(ruta);
+        archivo.htmlTokens("Tokens_correctos");
+        Token[] correcto = procesadorPz.getTokens();
+        for (int i = 0; i < correcto.length; i++) {
+            Token token = correcto[i];
+            if (token != null) {
+                archivo.escribirHtml(token.getNumero(), token.getLexema(), token.getTipo(), token.getFila(), token.getColumna());
+            }
+
+        }
+    }
+
+    public void crearHtmlTokensIncorrectos(String ruta) {
+        archivo.crearArchivoHtml(ruta);
+        archivo.htmlTokens("Tokens_incorrectos");
+        int contador = 0;
+        Error[] errores = procesadorPz.getErrores();
+        for (int i = 0; i < errores.length; i++) {
+            Error error = errores[i];
+            if (error != null) {
+                archivo.escribirHtml(error.getNumero(), error.getLexema(), error.getTipoError(), error.getFila(), error.getColumna());
+                contador++;
+            }
+
+        }
+        if (contador == 0) {
+            archivo.escribirHtml(0, "SIN ERRORES", "SIN ERRORES", 0, 0);
+        }
     }
 
 }
