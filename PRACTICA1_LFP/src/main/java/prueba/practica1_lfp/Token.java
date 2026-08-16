@@ -23,4 +23,27 @@ public class Token {
         this.fila = fila;
         this.columna = columna;
     }
+
+    public int getNumero() {
+        return numero;
+    }
+
+    public String getLexema() {
+        return lexema;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public int getColumna() {
+        return columna;
+    }
+
+    public int getFila() {
+        return fila;
+    }
+    
+    
+    
 }

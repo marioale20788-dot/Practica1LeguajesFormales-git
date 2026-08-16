@@ -4,6 +4,9 @@
  */
 package prueba.practica1_lfp;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  *
  * @author mario
@@ -14,115 +17,332 @@ public class AnalizadorPz {
     private int posicion;
     private int fila;
     private int columna;
-    private Token[] tokens;
-    private Error[] errores;
-    private int contadorTokens;
-    private int contadorErrores;
-    private int numeroToken;
-    private Archivo archivo;
+    private Archivo archivo = new Archivo();
+    private procesador procesadorPz;
 
     public AnalizadorPz(File archivo) throws IOException {
         this.contenido = this.archivo.leerArchivo(archivo);
         this.posicion = 0;
         this.fila = 1;
         this.columna = 1;
-        this.tokens = new Token[500];
-        this.errores = new Error[500];
-        this.contadorTokens = 0;
-        this.contadorErrores = 0;
-        this.numeroToken = 0;
+        this.procesadorPz = new procesador();
+    }
+
+    public procesador getProcesadorPz() {
+        return procesadorPz;
     }
 
     public void analizar() {
+     
         while (posicion < contenido.length()) {
             char c = contenido.charAt(posicion);
 
             if (espacio(c)) {
-
+                avanzarEspacio(c);
                 continue;
             }
 
             if (comentarioLinea(c)) {
-
+                saltarComentarioLinea();
                 continue;
             }
 
             if (comentarioBloque(c)) {
-
+                saltarComentarioBloque();
                 continue;
             }
 
             if (c == '"') {
-
+                procesarCadena();
                 continue;
             }
 
             if (digito(c)) {
-
+                procesarNumero();
                 continue;
             }
 
             if (letra(c) || c == '_') {
-
+                procesarIdentificador();
                 continue;
             }
 
             if (c == '@') {
-
+                procesarDirectiva();
                 continue;
             }
 
             if (flecha(c)) {
-
+                procesarFlecha();
                 continue;
             }
 
             if (delimitador(c)) {
-
+                procesarDelimitador(c);
                 continue;
             }
 
             if (operador(c)) {
-
+                procesarOperador(c);
                 continue;
             }
 
+            procesadorPz.agregarError("" + c, "Carácter no reconocido", fila, columna);
+            posicion++;
+            columna++;
+        }
+
+    }
+
+    public boolean espacio(char c) {
+        if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean comentarioLinea(char c) {
+        if (c == '/' && posicion + 1 < contenido.length() && contenido.charAt(posicion + 1) == '/') {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean comentarioBloque(char c) {
+        if (c == '/' && posicion + 1 < contenido.length() && contenido.charAt(posicion + 1) == '*') {
+            return true;
+        }
+        return false;
+
+    }
+
+    public boolean digito(char c) {
+        if (c >= '0' && c <= '9') {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean letra(char c) {
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean flecha(char c) {
+        if (c == '-' && posicion + 1 < contenido.length() && contenido.charAt(posicion + 1) == '>') {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean delimitador(char c) {
+        if (c == '{' || c == '}' || c == '(' || c == ')' || c == ',') {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean operador(char c) {
+        if (c == '=' || c == '+') {
+            return true;
+        }
+        return false;
+    }
+
+    public void avanzarEspacio(char c) {
+        if (c == '\n') {
+            fila++;
+            columna = 1;
+        } else {
+            columna++;
+        }
+        posicion++;
+    }
+
+    public void saltarComentarioLinea() {
+        posicion = posicion + 2;
+        columna = columna + 2;
+        while (posicion < contenido.length() && contenido.charAt(posicion) != '\n') {
+            posicion++;
+            columna++;
         }
     }
 
-    private boolean espacio(char c) {
-        return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+    public void saltarComentarioBloque() {
+        posicion = posicion + 2;
+        columna = columna + 2;
+        while (posicion < contenido.length() - 1) {
+            if (contenido.charAt(posicion) == '*' && contenido.charAt(posicion + 1) == '/') {
+                posicion = posicion + 2;
+                columna = columna + 2;
+                return;
+            }
+            if (contenido.charAt(posicion) == '\n') {
+                fila++;
+                columna = 1;
+            } else {
+                columna++;
+            }
+            posicion++;
+        }
+        procesadorPz.agregarError("/*", "Comentario bloque sin cerrar", fila, columna);
     }
 
-    private boolean comentarioLinea(char c) {
-        return c == '/' && posicion + 1 < contenido.length()
-                && contenido.charAt(posicion + 1) == '/';
+    public void procesarCadena() {
+        int iniFila = fila;
+        int iniCol = columna;
+        String lexema = "\"";
+
+        posicion++;
+        columna++;
+
+        while (posicion < contenido.length()) {
+            char c = contenido.charAt(posicion);
+            if (c == '"') {
+                lexema = lexema + '"';
+                posicion++;
+                columna++;
+                procesadorPz.agregarToken(lexema, "CADENA", iniFila, iniCol);
+                return;
+            }
+            if (c == '\n') {
+                break;
+            }
+            lexema = lexema + c;
+            posicion++;
+            columna++;
+        }
+
+        procesadorPz.agregarError(lexema, "Cadena sin cerrar", iniFila, iniCol);
     }
 
-    private boolean comentarioBloque(char c) {
-        return c == '/' && posicion + 1 < contenido.length()
-                && contenido.charAt(posicion + 1) == '*';
+    public void procesarNumero() {
+        int iniFila = fila;
+        int iniCol = columna;
+        String lexema = "";
+        boolean esDecimal = false;
+
+        while (posicion < contenido.length()) {
+            char c = contenido.charAt(posicion);
+            if (digito(c)) {
+                lexema = lexema + c;
+                posicion++;
+                columna++;
+            } else if (c == '.' && !esDecimal) {
+                lexema = lexema + c;
+                esDecimal = true;
+                posicion++;
+                columna++;
+            } else {
+                break;
+            }
+        }
+
+        String tipo;
+        if (esDecimal == true) {
+            tipo = "LITERAL_DECIMAL";
+        } else {
+            tipo = "LITERAL_ENTERO";
+        }
+        procesadorPz.agregarToken(lexema, tipo, iniFila, iniCol);
     }
 
-    private boolean digito(char c) {
-        return c >= '0' && c <= '9';
+    public void procesarIdentificador() {
+        int inicioFila = fila;
+        int inicioCol = columna;
+        String lexema = "";
+
+        while (posicion < contenido.length()) {
+            char c = contenido.charAt(posicion);
+            if (letra(c) || digito(c) || c == '_') {
+                lexema = lexema + c;
+                posicion++;
+                columna++;
+            } else {
+                break;
+            }
+        }
+      
+
+        String tipo = clasificarIdentificador(lexema);
+        procesadorPz.agregarToken(lexema, tipo, inicioFila, inicioCol);
     }
 
-    private boolean letra(char c) {
-        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    public String clasificarIdentificador(String lexema) {
+        if (lexema.equals("AGENTE") || lexema.equals("contexto")
+                || lexema.equals("variable") || lexema.equals("EJECUTAR")
+                || lexema.equals("EXPORTAR")) {
+            return "PALABRA_RESERVADA";
+        }
+        if (lexema.equals("PREGUNTAR") || lexema.equals("GENERAR")
+                || lexema.equals("RESUMIR") || lexema.equals("ANALIZAR")
+                || lexema.equals("TRADUCIR") || lexema.equals("CLASIFICAR")
+                || lexema.equals("EXTRAER") || lexema.equals("CARGAR")) {
+            return "COMANDO_IA";
+        }
+        if (lexema.equals("SOBRE") || lexema.equals("DESDE")
+                || lexema.equals("EN") || lexema.equals("COMO")) {
+            return "CONECTOR";
+        }
+        return "IDENTIFICADOR";
     }
 
-    private boolean flecha(char c) {
-        return c == '-' && posicion + 1 < contenido.length()
-                && contenido.charAt(posicion + 1) == '>';
+    public void procesarDirectiva() {
+        int iniFila = fila;
+        int iniCol = columna;
+        String lexema = "@";
+
+        posicion++;
+        columna++;
+
+        while (posicion < contenido.length()) {
+            char c = contenido.charAt(posicion);
+            if (letra(c) || c == '-') {
+                lexema = lexema + c;
+                posicion++;
+                columna++;
+            } else {
+                break;
+            }
+        }
+
+        if (directivaValida(lexema)) {
+            procesadorPz.agregarToken(lexema, "DIRECTIVA", iniFila, iniCol);
+        } else {
+            procesadorPz.agregarError(lexema, "Directiva no válida", iniFila, iniCol);
+        }
     }
 
-    private boolean delimitador(char c) {
-        return c == '{' || c == '}' || c == '(' || c == ')';
+    public boolean directivaValida(String lexema) {
+        return lexema.equals("@modelo") || lexema.equals("@rol") || lexema.equals("@formato");
     }
 
-    private boolean operador(char c) {
-        return c == '=' || c == '+';
+    public void procesarFlecha() {
+        int iniFila = fila;
+        int iniCol = columna;
+        procesadorPz.agregarToken("->", "CONECTOR", iniFila, iniCol);
+        posicion = posicion + 2;
+        columna = columna + 2;
+    }
+
+    public void procesarDelimitador(char c) {
+        procesadorPz.agregarToken("" + c, "DELIMITADOR", fila, columna);
+        posicion++;
+        columna++;
+    }
+
+    public void procesarOperador(char c) {
+        String tipo;
+        if (c == '=') {
+            tipo = "ASIGNACION";
+        } else {
+            tipo = "CONCATENACION";
+        }
+        procesadorPz.agregarToken("" + c, tipo, fila, columna);
+        posicion++;
+        columna++;
     }
 
 }

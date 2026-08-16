@@ -16,10 +16,10 @@ import javax.swing.JOptionPane;
 public class Archivo {
 
     Scanner scanner = new Scanner(System.in);
-    private String archivo;
+    private String archivo = "";
 
     public String leerArchivo(File archivoPz) {
-       
+
         try {
             scanner = new Scanner(archivoPz);
             while (scanner.hasNextLine()) {
@@ -29,10 +29,8 @@ public class Archivo {
         } catch (FileNotFoundException ex) {
             System.getLogger(Archivo.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
         }
-return archivo;
+
+        return archivo;
     }
-    
-    
-    
 
 }

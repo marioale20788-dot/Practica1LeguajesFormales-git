@@ -22,5 +22,21 @@ public class Error {
         this.fila = fila;
         this.columna = columna;
     }
+
+    public String getLexema() {
+        return lexema;
+    }
+
+    public String getMensaje() {
+        return mensaje;
+    }
+
+    public int getFila() {
+        return fila;
+    }
+
+    public int getColumna() {
+        return columna;
+    }
     
 }
