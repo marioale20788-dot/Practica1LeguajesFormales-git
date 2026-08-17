@@ -9,7 +9,8 @@ package prueba.practica1_lfp;
  * @author mario
  */
 public class Procesador {
-     private Token[] tokens;
+
+    private Token[] tokens;
     private Error[] errores;
     private int contadorTokens;
     private int contadorErrores;
@@ -30,25 +31,20 @@ public class Procesador {
         contadorTokens++;
     }
 
-        public void agregarError(String lexema, String mensaje, int fila, int columna) {
+    public void agregarError(String lexema, String mensaje, int fila, int columna) {
         numeroError++;
-            errores[contadorErrores] = new Error(lexema, mensaje, fila, columna,numeroError);
+        errores[contadorErrores] = new Error(lexema, mensaje, fila, columna, numeroError);
         contadorErrores++;
     }
 
-    public Token[] getTokens() {Token[] resultado = new Token[contadorTokens];
-        for (int i = 0; i < contadorTokens; i++) {
-            resultado[i] = tokens[i];
-        }
-        return resultado;
+    public Token[] getTokens() {
+
+        return tokens;
     }
 
     public Error[] getErrores() {
-        Error[] resultado = new Error[contadorErrores];
-        for (int i = 0; i < contadorErrores; i++) {
-            resultado[i] = errores[i];
-        }
-        return resultado;
+
+        return errores;
     }
 
     public int getNumTokens() {

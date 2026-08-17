@@ -339,9 +339,9 @@ public class AnalizadorPz {
     public void procesarOperador(char c) {
         String tipo;
         if (c == '=') {
-            tipo = "ASIGNACION";
+            tipo = "OPERADOR_ASIGNACION";
         } else {
-            tipo = "CONCATENACION";
+            tipo = "OPERADOR_CONCATENACION";
         }
         procesadorPz.agregarToken("" + c, tipo, fila, columna);
         posicion++;
