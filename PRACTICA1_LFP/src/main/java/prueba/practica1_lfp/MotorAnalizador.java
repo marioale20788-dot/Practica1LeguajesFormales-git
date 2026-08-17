@@ -37,6 +37,7 @@ public class MotorAnalizador {
         cargarTablaTokensIncorrectos();
 
     }
+   
 
     public void cargaTablaTokensCorrectos() {
         DefaultTableModel modeloTabla = (DefaultTableModel) principalFrame.getTableTokensCorrectos().getModel();
