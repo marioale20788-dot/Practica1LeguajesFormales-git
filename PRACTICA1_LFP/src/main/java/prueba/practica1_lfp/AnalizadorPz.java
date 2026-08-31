@@ -138,7 +138,7 @@ public class AnalizadorPz {
     }
 
     public boolean delimitador(char c) {
-        if (c == '{' || c == '}' || c == '(' || c == ')' || c == ',') {
+        if (c == '{' || c == '}' || c == '(' || c == ')' || c == ',' || c == ';') {
             return true;
         }
         return false;
@@ -194,7 +194,7 @@ public class AnalizadorPz {
         int inicioFila = fila;
         int inicioColumna = columna;
         String lexema = "";
-        procesadorPz.agregarToken("\"", "DELIMITADOR", inicioFila, inicioColumna);
+
         posicion++;
         columna++;
 
@@ -202,7 +202,6 @@ public class AnalizadorPz {
             char c = contenido.charAt(posicion);
             if (c == '"') {
                 procesadorPz.agregarToken(lexema, "LITERAL_CADENA", inicioFila, inicioColumna + 1);
-                procesadorPz.agregarToken("\"", "DELIMITADOR", inicioFila, columna);
                 posicion++;
                 columna++;
 
@@ -273,7 +272,7 @@ public class AnalizadorPz {
     public String clasificarIdentificador(String lexema) {
         if (lexema.equals("AGENTE") || lexema.equals("contexto")
                 || lexema.equals("variable") || lexema.equals("EJECUTAR")
-                || lexema.equals("EXPORTAR")) {
+                || lexema.equals("EXPORTAR") || lexema.equals("CODIFICAR")) {
             return "PALABRA_RESERVADA";
         }
         if (lexema.equals("PREGUNTAR") || lexema.equals("GENERAR")
