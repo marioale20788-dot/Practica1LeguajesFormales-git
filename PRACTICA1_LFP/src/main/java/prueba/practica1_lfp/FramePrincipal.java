@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -62,10 +63,15 @@ public class FramePrincipal extends javax.swing.JFrame {
         TableTokensCorrectos = new javax.swing.JTable();
         jScrollPane3 = new javax.swing.JScrollPane();
         TableTokensIncorrectos = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtAreaTexto = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
         btnCargarArchvio = new javax.swing.JMenu();
+        btnAnalizar = new javax.swing.JMenu();
+        btnGuardar = new javax.swing.JMenu();
         btnTokensCorrectosHTml = new javax.swing.JMenu();
         btnTokensIncorrectosHtml = new javax.swing.JMenu();
+        btnImagenAfd = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -100,6 +106,10 @@ public class FramePrincipal extends javax.swing.JFrame {
         ));
         jScrollPane3.setViewportView(TableTokensIncorrectos);
 
+        txtAreaTexto.setColumns(20);
+        txtAreaTexto.setRows(5);
+        jScrollPane2.setViewportView(txtAreaTexto);
+
         jMenuBar1.setBackground(new java.awt.Color(255, 255, 255));
 
         btnCargarArchvio.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -110,6 +120,22 @@ public class FramePrincipal extends javax.swing.JFrame {
             }
         });
         jMenuBar1.add(btnCargarArchvio);
+
+        btnAnalizar.setText("analizar");
+        btnAnalizar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnAnalizarMouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(btnAnalizar);
+
+        btnGuardar.setText("Guardar archivo");
+        btnGuardar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnGuardarMouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(btnGuardar);
 
         btnTokensCorrectosHTml.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         btnTokensCorrectosHTml.setText("Importar html tokens correctos");
@@ -129,6 +155,14 @@ public class FramePrincipal extends javax.swing.JFrame {
         });
         jMenuBar1.add(btnTokensIncorrectosHtml);
 
+        btnImagenAfd.setText("Imagen AFD");
+        btnImagenAfd.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnImagenAfdMouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(btnImagenAfd);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -136,20 +170,23 @@ public class FramePrincipal extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(18, 18, 18)
+                .addGap(69, 69, 69)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 852, Short.MAX_VALUE)
-                    .addComponent(jScrollPane3))
-                .addContainerGap(18, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 868, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 868, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
+                .addContainerGap(67, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 349, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 424, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(62, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(25, 25, 25))
         );
 
         pack();
@@ -176,43 +213,90 @@ public class FramePrincipal extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnCargarArchvioMouseClicked
 
+    public JTextArea getTxtAreaTexto() {
+        return txtAreaTexto;
+    }
+
     private void btnTokensCorrectosHTmlMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTokensCorrectosHTmlMouseClicked
+         String nombre = JOptionPane.showInputDialog("Introduce tu nombre:");
+        if (nombre == null) {
+            return;
+        }
         JFileChooser seleccionar = new JFileChooser();
         seleccionar.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
         int resultado = seleccionar.showOpenDialog(null);
 
-        if (resultado == JFileChooser.APPROVE_OPTION && archivoFile!=null) {
+        if (resultado == JFileChooser.APPROVE_OPTION) {
 
             File carpeta = seleccionar.getSelectedFile();
             direccionHtml = carpeta.getAbsolutePath();
-            motor.crearHtmlTokensCorrectos();
+            motor.crearHtmlTokensCorrectos(nombre);
 
-        }else{
+        } else {
+
             JOptionPane.showMessageDialog(null, "No se puede crear el archivo html");
         }
 // TODO add your handling code here:
     }//GEN-LAST:event_btnTokensCorrectosHTmlMouseClicked
 
     private void btnTokensIncorrectosHtmlMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnTokensIncorrectosHtmlMouseClicked
+        String nombre = JOptionPane.showInputDialog("Introduce tu nombre:");
+        if (nombre == null) {
+            return;
+        }
         JFileChooser seleccionar = new JFileChooser();
         seleccionar.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
         int resultado = seleccionar.showOpenDialog(null);
 
-        if (resultado == JFileChooser.APPROVE_OPTION && archivoFile!=null) {
+        if (resultado == JFileChooser.APPROVE_OPTION) {
 
             File carpeta = seleccionar.getSelectedFile();
             direccionHtml = carpeta.getAbsolutePath();
-            motor.crearHtmlTokensIncorrectos();
+            motor.crearHtmlTokensIncorrectos(nombre);
 
-        }else{
+        } else {
             JOptionPane.showMessageDialog(null, "No se puede crear el archivo html");
         }
 // TODO add 
 
 // TODO add your handling code here:
     }//GEN-LAST:event_btnTokensIncorrectosHtmlMouseClicked
+
+    private void btnAnalizarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAnalizarMouseClicked
+
+        motor.analizarArchivo();
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnAnalizarMouseClicked
+
+    private void btnGuardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnGuardarMouseClicked
+        String nombre = JOptionPane.showInputDialog("Introduce tu nombre:");
+        if (nombre == null) {
+            return;
+        }
+        JFileChooser seleccionar = new JFileChooser();
+        seleccionar.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        int resultado = seleccionar.showOpenDialog(null);
+
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+
+            File carpeta = seleccionar.getSelectedFile();
+            direccionHtml = carpeta.getAbsolutePath();
+            motor.crearPz(nombre);
+
+        } else {
+            JOptionPane.showMessageDialog(null, "No se puede crear el archivo html");
+        }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnGuardarMouseClicked
+
+    private void btnImagenAfdMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnImagenAfdMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnImagenAfdMouseClicked
 
     /**
      * @param args the command line arguments
@@ -221,11 +305,16 @@ public class FramePrincipal extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable TableTokensCorrectos;
     private javax.swing.JTable TableTokensIncorrectos;
+    private javax.swing.JMenu btnAnalizar;
     private javax.swing.JMenu btnCargarArchvio;
+    private javax.swing.JMenu btnGuardar;
+    private javax.swing.JMenu btnImagenAfd;
     private javax.swing.JMenu btnTokensCorrectosHTml;
     private javax.swing.JMenu btnTokensIncorrectosHtml;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextArea txtAreaTexto;
     // End of variables declaration//GEN-END:variables
 }

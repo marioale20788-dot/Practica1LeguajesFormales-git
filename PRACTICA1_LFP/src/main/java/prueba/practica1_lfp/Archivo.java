@@ -42,6 +42,20 @@ public class Archivo {
 
     }
 
+    public void pzTexto(String nombre, String texto) {
+        file = new File(ruta + "/" + nombre + ".pz");
+
+        try {
+            FileWriter writer = new FileWriter(file);
+
+            writer.write(texto);
+            writer.close();
+
+        } catch (IOException ex) {
+            System.getLogger(Archivo.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }
+
     public void htmlTokens(String tokenCorrectoIncorrecto) {
         try {
 

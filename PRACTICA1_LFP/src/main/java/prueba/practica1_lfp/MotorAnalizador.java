@@ -7,6 +7,7 @@ package prueba.practica1_lfp;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -22,29 +23,38 @@ public class MotorAnalizador {
     public void inciarAnalizadorLexico() {
         principalFrame.setVisible(true);
         principalFrame.setMotor(this);
+             analizador = new AnalizadorPz();
+       
     }
 
     public void cargarArchivo() {
         File archivoDirecto = principalFrame.getArchivo();
-
-        try {
-            analizador = new AnalizadorPz(archivoDirecto);
-            analizador.analizar();
-        } catch (IOException ex) {
-            System.getLogger(MotorAnalizador.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-        }
-        cargaTablaTokensCorrectos();
-        cargarTablaTokensIncorrectos();
+        analizador = new AnalizadorPz();
+        String texto = analizador.pasarTextoAVisualizador(archivoDirecto);
+        principalFrame.getTxtAreaTexto().setText(texto);
 
     }
-   
+
+    public void analizarArchivo() {
+
+        try {
+            String texto = principalFrame.getTxtAreaTexto().getText();
+   analizador = new AnalizadorPz();
+            analizador.analizar(texto);
+            cargaTablaTokensCorrectos();
+            cargarTablaTokensIncorrectos();
+        } catch (NullPointerException e) {
+            JOptionPane.showMessageDialog(principalFrame, "no se pudo hacer esta accion");
+        }
+
+    }
 
     public void cargaTablaTokensCorrectos() {
         DefaultTableModel modeloTabla = (DefaultTableModel) principalFrame.getTableTokensCorrectos().getModel();
- 
+
         Token[] tokensCorrectos = analizador.getProcesadorPz().getTokens();
         modeloTabla.setRowCount(0);
-     
+
         for (int i = 0; i < tokensCorrectos.length; i++) {
             Token tokensCorrecto = tokensCorrectos[i];
             if (tokensCorrecto != null) {
@@ -80,14 +90,26 @@ public class MotorAnalizador {
         }
 
     }
-    
-    public void crearHtmlTokensCorrectos(){
+
+    public void crearHtmlTokensCorrectos(String nombre) {
         String ruta = principalFrame.getDireccionHtml();
-        analizador.creraHtmlTokensCorrectos(ruta);
+        analizador.creraHtmlTokensCorrectos(ruta,nombre);
     }
-    public void crearHtmlTokensIncorrectos(){
-         String ruta = principalFrame.getDireccionHtml();
-        analizador.crearHtmlTokensIncorrectos(ruta);
+
+    public void crearHtmlTokensIncorrectos(String nombre) {
+        String ruta = principalFrame.getDireccionHtml();
+       
+     
+            analizador.crearHtmlTokensIncorrectos(ruta,nombre);
+     
+
+    }
+
+    public void crearPz(String nombre) {
+        String ruta = principalFrame.getDireccionHtml();
+        String texto = principalFrame.getTxtAreaTexto().getText();
+        analizador.crearPz(ruta, nombre, texto);
+
     }
 
 }

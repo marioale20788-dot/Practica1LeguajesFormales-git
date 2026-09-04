@@ -6,6 +6,7 @@ package prueba.practica1_lfp;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  *
@@ -13,27 +14,38 @@ import java.io.IOException;
  */
 public class AnalizadorPz {
 
-    private String contenido;
+    private String contenido = "";
     private int posicion;
     private int fila;
     private int columna;
     private Archivo archivo = new Archivo();
     private Procesador procesadorPz;
+    private HashMap consultor = new HashMap();
 
-    public AnalizadorPz(File archivo) throws IOException {
-        this.contenido = this.archivo.leerArchivo(archivo);
+    public AnalizadorPz() {
+
         this.posicion = 0;
         this.fila = 1;
         this.columna = 1;
         this.procesadorPz = new Procesador();
+
+    }
+
+    public String pasarTextoAVisualizador(File archivo) {
+        this.contenido = this.archivo.leerArchivo(archivo);
+        return contenido;
     }
 
     public Procesador getProcesadorPz() {
         return procesadorPz;
     }
 
-    public void analizar() {
+    public String getContenido() {
+        return contenido;
+    }
 
+    public void analizar(String texto) {
+        this.contenido = texto;
         while (posicion < contenido.length()) {
             char c = contenido.charAt(posicion);
 
@@ -194,59 +206,72 @@ public class AnalizadorPz {
         int inicioFila = fila;
         int inicioColumna = columna;
         String lexema = "";
-
         posicion++;
         columna++;
 
-        while (posicion < contenido.length()) {
+        boolean cadenaValida = false;
+        boolean error = false;
+
+        while (posicion < contenido.length() && cadenaValida == false && error == false) {
             char c = contenido.charAt(posicion);
             if (c == '"') {
-                procesadorPz.agregarToken(lexema, "LITERAL_CADENA", inicioFila, inicioColumna + 1);
+                cadenaValida = true;
                 posicion++;
                 columna++;
-
-                return;
+            } else if (c == '\n') {
+                error = true;
+            } else {
+                lexema = lexema + c;
+                posicion++;
+                columna++;
             }
-            if (c == '\n') {
-                break;
-            }
-            lexema = lexema + c;
-            posicion++;
-            columna++;
+        }
+        if (cadenaValida == false && error == false) {
+            error = true;
         }
 
-        procesadorPz.agregarError(lexema, "Cadena sin cerrar", inicioFila, inicioColumna);
+        if (cadenaValida == true) {
+            procesadorPz.agregarToken(lexema, "LITERAL_CADENA", inicioFila, inicioColumna + 1);
+        } else {
+            procesadorPz.agregarError(lexema, "Cadena sin cerrar", inicioFila, inicioColumna);
+        }
     }
 
     public void procesarNumero() {
         int inicioFila = fila;
         int inicioColumna = columna;
         String lexema = "";
-        boolean esDecimal = false;
 
-        while (posicion < contenido.length()) {
-            char c = contenido.charAt(posicion);
-            if (digito(c)) {
-                lexema = lexema + c;
-                posicion++;
-                columna++;
-            } else if (c == '.' && !esDecimal) {
-                lexema = lexema + c;
-                esDecimal = true;
-                posicion++;
-                columna++;
+        while (posicion < contenido.length() && digito(contenido.charAt(posicion))) {
+            lexema = lexema + contenido.charAt(posicion);
+            posicion++;
+            columna++;
+        }
+
+        if (posicion < contenido.length() && contenido.charAt(posicion) == '.') {
+            lexema = lexema + contenido.charAt(posicion);
+            posicion++;
+            columna++;
+
+            if (posicion < contenido.length() && digito(contenido.charAt(posicion))) {
+
+                while (posicion < contenido.length() && digito(contenido.charAt(posicion))) {
+                    lexema = lexema + contenido.charAt(posicion);
+                    posicion++;
+                    columna++;
+                }
+
+                procesadorPz.agregarToken(lexema, "LITERAL_DECIMAL", inicioFila, inicioColumna);
+                return;
             } else {
-                break;
+
+                procesadorPz.agregarError(lexema, "Número decimal inválido (falta parte decimal)", inicioFila, inicioColumna);
+                return;
             }
+
         }
 
-        String tipo;
-        if (esDecimal == true) {
-            tipo = "LITERAL_DECIMAL";
-        } else {
-            tipo = "LITERAL_ENTERO";
-        }
-        procesadorPz.agregarToken(lexema, tipo, inicioFila, inicioColumna);
+        procesadorPz.agregarToken(lexema, "LITERAL_ENTERO", inicioFila, inicioColumna);
     }
 
     public void procesarIdentificador() {
@@ -324,12 +349,25 @@ public class AnalizadorPz {
     public void procesarFlecha() {
         int inicioFila = fila;
         int inicioColumna = columna;
-        procesadorPz.agregarToken("->", "CONECTOR", inicioFila, inicioColumna);
-        posicion = posicion + 2;
-        columna = columna + 2;
+        char c = contenido.charAt(posicion);
+        String lexema = "";
+        if (c == '-') {
+            lexema = lexema + c;
+            posicion = posicion + 1;
+            columna = columna + 1;
+             c = contenido.charAt(posicion);
+        }
+        if (c == '>') {
+            lexema = lexema + c;
+            posicion = posicion + 1;
+            columna = columna + 1;
+        }
+        procesadorPz.agregarToken(lexema, "CONECTOR", inicioFila, inicioColumna);
+
     }
 
     public void procesarDelimitador(char c) {
+       
         procesadorPz.agregarToken("" + c, "DELIMITADOR", fila, columna);
         posicion++;
         columna++;
@@ -347,9 +385,9 @@ public class AnalizadorPz {
         columna++;
     }
 
-    public void creraHtmlTokensCorrectos(String ruta) {
+    public void creraHtmlTokensCorrectos(String ruta, String nombre) {
         archivo.crearArchivoHtml(ruta);
-        archivo.htmlTokens("Tokens_correctos");
+        archivo.htmlTokens(nombre);
         Token[] correcto = procesadorPz.getTokens();
         for (int i = 0; i < correcto.length; i++) {
             Token token = correcto[i];
@@ -360,9 +398,9 @@ public class AnalizadorPz {
         }
     }
 
-    public void crearHtmlTokensIncorrectos(String ruta) {
+    public void crearHtmlTokensIncorrectos(String ruta, String nombre) {
         archivo.crearArchivoHtml(ruta);
-        archivo.htmlTokens("Tokens_incorrectos");
+        archivo.htmlTokens(nombre);
         int contador = 0;
         Error[] errores = procesadorPz.getErrores();
         for (int i = 0; i < errores.length; i++) {
@@ -376,6 +414,13 @@ public class AnalizadorPz {
         if (contador == 0) {
             archivo.escribirHtml(0, "SIN ERRORES", "SIN ERRORES", 0, 0);
         }
+    }
+
+    public void crearPz(String ruta, String nombre, String texto) {
+        archivo.crearArchivoHtml(ruta);
+
+        archivo.pzTexto(nombre, texto);
+
     }
 
 }
