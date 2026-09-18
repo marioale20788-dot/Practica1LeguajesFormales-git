@@ -4,54 +4,101 @@
  */
 package prueba.practica1_lfp;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author mario
  */
 public class Procesador {
 
-    private Token[] tokens;
-    private Error[] errores;
+    private ArrayList<Token> tokens = new ArrayList<>();
+private ArrayList<Error> errores = new ArrayList<>();
     private int contadorTokens;
     private int contadorErrores;
     private int numeroToken;
     private int numeroError;
 
     public Procesador() {
-        this.tokens = new Token[500];
-        this.errores = new Error[500];
+ 
         this.contadorTokens = 0;
         this.contadorErrores = 0;
         this.numeroToken = 0;
     }
-
+  
     public void agregarToken(String lexema, String tipo, int fila, int columna) {
         numeroToken++;
-        tokens[contadorTokens] = new Token(numeroToken, lexema, tipo, fila, columna);
-        contadorTokens++;
+     
+        
+       String color = color(tipo);
+          Token token = new Token(numeroToken, lexema, tipo, fila, columna,color);
+       
+        tokens.add(token);
+        
+     
     }
 
     public void agregarError(String lexema, String mensaje, int fila, int columna) {
         numeroError++;
-        errores[contadorErrores] = new Error(lexema, mensaje, fila, columna, numeroError);
-        contadorErrores++;
+        Error error= new Error(lexema, mensaje, fila, columna, numeroError);
+        errores.add(error);
+    
+    }
+    
+    public  String color(String tipo){
+          if (tipo.equalsIgnoreCase("PALABRA RESERVADA")) {
+                return "#38BDF8";
+            }
+            if (tipo.equalsIgnoreCase("COMANDO IA")) {
+               return "#A855F7";
+            }
+            if (tipo.equalsIgnoreCase("CONECTOR")) {
+               return  "#3B82F6";
+            }
+            if (tipo.equalsIgnoreCase("FUNCION")) {
+                return "#22C55E";
+            }
+            if (tipo.equalsIgnoreCase("DIRECTIVA")) {
+                return "#14B8A6";
+            }
+            if (tipo.equalsIgnoreCase("DELIMITADOR")) {
+                return "#94A3B8";
+            }
+            if (tipo.equalsIgnoreCase("LITERAL_CADENA")) {
+               return "#F59E0B";
+            }
+            if (tipo.equalsIgnoreCase("LITERAL_DECIMAL")) {
+                return "#10B981";
+            }
+            if (tipo.equalsIgnoreCase("LITERAL_ENTERO")) {
+                 return "#10B981";
+            }
+  
+            if (tipo.equalsIgnoreCase("OPERADOR_ASIGNACION")) {
+                return "#EF4444";
+            }
+            if (tipo.equalsIgnoreCase("OPERADOR_CONCATENACION")) {
+                 return "#EC4899";
+            }
+return "#EC4899";
+    }
+            
+
+    public ArrayList<Token> getTokens() {
+
+        return this.tokens;
     }
 
-    public Token[] getTokens() {
+    public ArrayList<Error> getErrores() {
 
-        return tokens;
-    }
-
-    public Error[] getErrores() {
-
-        return errores;
+        return this.errores;
     }
 
     public int getNumTokens() {
-        return contadorTokens;
+        return numeroToken;
     }
 
     public int getNumErrores() {
-        return contadorErrores;
+        return numeroError;
     }
 }

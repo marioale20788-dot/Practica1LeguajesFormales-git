@@ -10,6 +10,13 @@
         <maven.compiler.release>17</maven.compiler.release>
         <exec.mainClass>prueba.practica1_lfp.PRACTICA1_LFP</exec.mainClass>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>guru.nidi</groupId>
+            <artifactId>graphviz-java</artifactId>
+            <version>0.18.1</version>
+        </dependency>
+    </dependencies>
      <build>
         <plugins>
             <plugin>
