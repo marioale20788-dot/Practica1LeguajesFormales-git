@@ -27,11 +27,9 @@ private ArrayList<Error> errores = new ArrayList<>();
     }
   
     public void agregarToken(String lexema, String tipo, int fila, int columna) {
-        numeroToken++;
-     
-        
+        numeroToken++;     
        String color = color(tipo);
-          Token token = new Token(numeroToken, lexema, tipo, fila, columna,color);
+          Token token = new Token(numeroToken, lexema, tipo, columna, fila,color);
        
         tokens.add(token);
         

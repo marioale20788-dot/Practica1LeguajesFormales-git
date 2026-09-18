@@ -15,14 +15,12 @@ import java.util.HashMap;
  */
 public class AnalizadorPz {
 
-
     private String contenido = "";
     private int posicion;
     private int fila;
     private int columna;
     private Archivo archivo;
     private Procesador procesadorPz;
-    private HashMap consultor = new HashMap();
     private final HashMap<String, String> tablaReservadas = new HashMap<>();
 
     public AnalizadorPz() {
@@ -79,10 +77,16 @@ public class AnalizadorPz {
     }
 
     public void analizar(String texto) {
+         this.posicion = 0;
+        this.fila = 1;
+        this.columna = 1;
         this.contenido = texto;
         while (posicion < contenido.length()) {
             char c = contenido.charAt(posicion);
-
+            if (c == '\r') {
+                posicion++;
+                continue;
+            }
             if (espacio(c) == true) {
                 avanzarEspacio(c);
                 continue;
@@ -159,7 +163,7 @@ public class AnalizadorPz {
     }
 
     public boolean delimitador(char c) {
-        if (c == '{' || c == '}' || c == '(' || c == ')'|| c==',') {
+        if (c == '{' || c == '}' || c == '(' || c == ')' || c == ',') {
             return true;
         }
         return false;
@@ -382,7 +386,7 @@ public class AnalizadorPz {
 
         ArrayList<Token> correcto = procesadorPz.getTokens();
         for (Token token : correcto) {
-            archivo.escribirHtml(token.getNumero(), token.getLexema(), token.getTipo(), token.getFila(), token.getColumna(),token.getColor());
+            archivo.escribirHtml(token.getNumero(), token.getLexema(), token.getTipo(), token.getFila(), token.getColumna(), token.getColor());
         }
 
     }
@@ -393,12 +397,12 @@ public class AnalizadorPz {
         int contador = 0;
         ArrayList<Error> errores = procesadorPz.getErrores();
         for (Error error : errores) {
-            archivo.escribirHtml(error.getNumero(), error.getLexema(), error.getTipoError(), error.getFila(), error.getColumna(),"#EF4444");
+            archivo.escribirHtml(error.getNumero(), error.getLexema(), error.getTipoError(), error.getFila(), error.getColumna(), "#EF4444");
             contador++;
         }
 
         if (contador == 0) {
-            archivo.escribirHtml(0, "SIN ERRORES", "SIN ERRORES", 0, 0,"#EF4444");
+            archivo.escribirHtml(0, "SIN ERRORES", "SIN ERRORES", 0, 0, "#EF4444");
         }
     }
 

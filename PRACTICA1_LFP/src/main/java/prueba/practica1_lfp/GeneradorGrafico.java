@@ -4,23 +4,16 @@
  */
 package prueba.practica1_lfp;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.engine.GraphvizCmdLineEngine;
-import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+
 
 /**
  *

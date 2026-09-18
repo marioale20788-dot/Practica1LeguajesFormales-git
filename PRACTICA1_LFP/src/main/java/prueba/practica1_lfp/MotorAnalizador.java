@@ -39,7 +39,7 @@ public class MotorAnalizador {
 
         try {
             String texto = principalFrame.getTxtAreaTexto().getText();
-            analizador = new AnalizadorPz();
+            this.analizador = new AnalizadorPz();
             analizador.analizar(texto);
             cargaTablaTokensCorrectos();
             cargarTablaTokensIncorrectos();
